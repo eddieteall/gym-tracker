@@ -6,8 +6,7 @@
   "scripts": {
   "start": "node server/server.js",
   "test": "echo \"Tests will go here\""
-}
-,
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
