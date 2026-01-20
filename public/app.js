@@ -123,4 +123,36 @@ document.addEventListener("DOMContentLoaded", () => {
     await loadExercises();
   });
 
+    const addLogForm = document.getElementById("addLogForm");
+
+  addLogForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!selectedExerciseId) {
+      alert("Select an exercise first.");
+      return;
+    }
+
+    const date = document.getElementById("logDate").value;
+    const weightKg = Number(document.getElementById("logWeight").value);
+    const reps = Number(document.getElementById("logReps").value);
+
+    const result = await apiPost("/api/logs", {
+      exerciseId: selectedExerciseId,
+      date,
+      weightKg,
+      reps
+    });
+
+    if (!result.ok) {
+      alert(result.data?.error || "Failed to add log");
+      return;
+    }
+
+    addLogForm.reset();
+
+    // Refresh the selected exercise details so the new log appears in the table
+    await selectExercise(selectedExerciseId);
+  });
+
 });

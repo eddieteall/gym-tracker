@@ -11,5 +11,13 @@
       "muscleGroup": "Legs"
     }
   ],
-  "logs": []
+  "logs": [
+    {
+      "id": "l1",
+      "exerciseId": "e1",
+      "date": "2026-01-20",
+      "weightKg": 70,
+      "reps": 8
+    }
+  ]
 }
