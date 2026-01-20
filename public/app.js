@@ -17,6 +17,24 @@ async function apiGet(url) {
   }
 }
 
+async function apiPost(url, bodyObj) {
+  try {
+    showServerError(false);
+
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bodyObj)
+    });
+
+    const data = await res.json();
+    return { ok: res.ok, status: res.status, data };
+  } catch (err) {
+    showServerError(true);
+    return { ok: false, status: 0, data: null };
+  }
+}
+
 function renderExerciseList(exercises) {
   const listEl = document.getElementById("exerciseList");
   listEl.innerHTML = "";
@@ -80,5 +98,29 @@ async function selectExercise(id) {
 document.addEventListener("DOMContentLoaded", () => {
   loadExercises();
 
-  // We'll wire up forms next step
+    const addExerciseForm = document.getElementById("addExerciseForm");
+
+  addExerciseForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const name = document.getElementById("exName").value;
+    const muscleGroup = document.getElementById("exMuscle").value;
+
+    const result = await apiPost("/api/exercises", {
+      name,
+      muscleGroup
+    });
+
+    if (!result.ok) {
+      alert(result.data?.error || "Failed to add exercise");
+      return;
+    }
+
+    // Clear inputs
+    addExerciseForm.reset();
+
+    // Refresh list
+    await loadExercises();
+  });
+
 });

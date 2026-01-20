@@ -1,0 +1,10 @@
+/* Small custom tweaks on top of Bootstrap */
+body { padding-bottom: 2rem; }
+
+#exerciseList button.btn-link {
+  text-decoration: none;
+}
+
+#exerciseList button.btn-link:hover {
+  text-decoration: underline;
+}

@@ -4,6 +4,11 @@
       "id": "e1",
       "name": "Bench Press",
       "muscleGroup": "Chest"
+    },
+    {
+      "id": "e2",
+      "name": "Squat",
+      "muscleGroup": "Legs"
     }
   ],
   "logs": []
