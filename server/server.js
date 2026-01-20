@@ -150,6 +150,40 @@ app.post("/api/logs", (req, res) => {
   res.status(200).json(newLog);
 });
 
+app.post("/api/logs/:id", (req, res) => {
+  const { date, weightKg, reps } = req.body;
+
+  const db = readDB();
+  const log = db.logs.find(l => l.id === req.params.id);
+
+  if (!log) {
+    return res.status(400).json({ error: "Unknown log id" });
+  }
+
+  if (date !== undefined) {
+    if (typeof date !== "string" || date.trim() === "") {
+      return res.status(400).json({ error: "Invalid date" });
+    }
+    log.date = date;
+  }
+
+  if (weightKg !== undefined) {
+    if (typeof weightKg !== "number" || weightKg <= 0) {
+      return res.status(400).json({ error: "Invalid weightKg" });
+    }
+    log.weightKg = weightKg;
+  }
+
+  if (reps !== undefined) {
+    if (typeof reps !== "number" || reps <= 0) {
+      return res.status(400).json({ error: "Invalid reps" });
+    }
+    log.reps = reps;
+  }
+
+  writeDB(db);
+  res.status(200).json(log);
+});
 
 
 app.listen(PORT, () => {
