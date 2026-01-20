@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gym Tracker</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+      <span class="navbar-brand mb-0 h1">Gym Tracker</span>
+    </div>
+  </nav>
+
+  <!-- Server error banner -->
+  <div id="serverError" class="alert alert-danger m-3 d-none" role="alert">
+    Cannot reach the server. Check it is running, then try again.
+  </div>
+
+  <main class="container my-3">
+    <div class="row g-3">
+      <!-- Left: Exercises -->
+      <div class="col-12 col-md-4">
+        <div class="card">
+          <div class="card-header">
+            Exercises
+          </div>
+          <ul id="exerciseList" class="list-group list-group-flush">
+            <!-- populated by JS -->
+          </ul>
+        </div>
+
+        <!-- Add exercise form -->
+        <div class="card mt-3">
+          <div class="card-header">Add Exercise</div>
+          <div class="card-body">
+            <form id="addExerciseForm">
+              <div class="mb-2">
+                <label class="form-label" for="exName">Name</label>
+                <input class="form-control" id="exName" required />
+              </div>
+              <div class="mb-2">
+                <label class="form-label" for="exMuscle">Muscle group</label>
+                <input class="form-control" id="exMuscle" required />
+              </div>
+              <button class="btn btn-primary w-100" type="submit">Add Exercise</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Selected exercise + logs -->
+      <div class="col-12 col-md-8">
+        <div class="card">
+          <div class="card-header">
+            <span id="selectedTitle">Select an exercise</span>
+          </div>
+          <div class="card-body">
+            <p class="mb-1"><strong>Muscle group:</strong> <span id="selectedMuscle">-</span></p>
+
+            <hr />
+
+            <h5>Logs</h5>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Weight (kg)</th>
+                    <th>Reps</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="logsTableBody">
+                  <!-- populated by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <hr />
+
+            <h5>Add Log</h5>
+            <form id="addLogForm">
+              <div class="row g-2">
+                <div class="col-12 col-md-4">
+                  <label class="form-label" for="logDate">Date</label>
+                  <input class="form-control" id="logDate" type="date" required />
+                </div>
+                <div class="col-6 col-md-4">
+                  <label class="form-label" for="logWeight">Weight (kg)</label>
+                  <input class="form-control" id="logWeight" type="number" step="0.5" min="0" required />
+                </div>
+                <div class="col-6 col-md-4">
+                  <label class="form-label" for="logReps">Reps</label>
+                  <input class="form-control" id="logReps" type="number" min="0" required />
+                </div>
+              </div>
+
+              <button id="addLogBtn" class="btn btn-success mt-3" type="submit" disabled>
+                Add Log to Selected Exercise
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Bootstrap JS (for components like modals later) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
