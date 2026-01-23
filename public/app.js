@@ -91,10 +91,29 @@ function renderSelectedExercise(exercise) {
     for (const log of exercise.logs) {
     const tr = document.createElement("tr");
 
+    //create edit button for each log entry
     const editBtn = document.createElement("button");
     editBtn.className = "btn btn-sm btn-outline-secondary";
     editBtn.textContent = "Edit";
     editBtn.addEventListener("click", () => openEditLogModal(log));
+
+    //create delete button for each log entry
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn btn-sm btn-outline-danger ms-2";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", async () => {
+    if (!confirm("Delete this log?")) return;
+
+    const result = await apiPost(`/api/logs/${log.id}/delete`, {});
+    if (!result.ok) {
+      alert(result.data?.error || "Failed to delete log");
+      return;
+    }
+
+    await selectExercise(selectedExerciseId);
+  });
+
+
 
     tr.innerHTML = `
       <td>${log.date}</td>
@@ -105,6 +124,7 @@ function renderSelectedExercise(exercise) {
     const tdActions = document.createElement("td");
     tdActions.className = "text-end";
     tdActions.appendChild(editBtn);
+    tdActions.appendChild(deleteBtn);
 
     tr.appendChild(tdActions);
     tbody.appendChild(tr);

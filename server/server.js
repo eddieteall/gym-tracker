@@ -185,6 +185,23 @@ app.post("/api/logs/:id", (req, res) => {
   res.status(200).json(log);
 });
 
+app.post("/api/logs/:id/delete", (req, res) => {
+  const db = readDB();
+
+  const index = db.logs.findIndex(
+    l => l.id === req.params.id
+  );
+
+  if (index === -1) {
+    return res.status(400).json({ error: "Unknown log id" });
+  }
+
+  const deleted = db.logs.splice(index, 1)[0];
+  writeDB(db);
+
+  res.status(200).json(deleted);
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
