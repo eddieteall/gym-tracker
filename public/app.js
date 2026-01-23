@@ -72,6 +72,22 @@ function renderSelectedExercise(exercise) {
   const tbody = document.getElementById("logsTableBody");
   tbody.innerHTML = "";
 
+    // If no logs yet then add a message displaying this
+  if (exercise.logs.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td colspan="4" class="text-muted">
+        No logs yet. Add one below.
+      </td>
+    `;
+    tbody.appendChild(tr);
+
+    // Still allow adding logs
+    document.getElementById("addLogBtn").disabled = false;
+    return;
+  }
+
+
     for (const log of exercise.logs) {
     const tr = document.createElement("tr");
 
