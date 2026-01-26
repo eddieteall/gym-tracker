@@ -1,7 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 
-const DB_PATH = path.join(__dirname, "..", "data", "db.json");
+// Allow overriding DB path via env for testing
+const DEFAULT_DB_PATH = path.join(__dirname, "..", "data", "db.json");
+const DB_PATH = process.env.DB_PATH || DEFAULT_DB_PATH;
+
 
 function readDB() {
   const raw = fs.readFileSync(DB_PATH, "utf-8");

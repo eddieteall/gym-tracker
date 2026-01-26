@@ -1,5 +1,28 @@
+const fs = require("fs");
+const path = require("path");
+
+// Use a separate DB file for tests
+const TEST_DB_PATH = path.join(__dirname, "test-db.json");
+
+// Seed data for each test
+const SEED_DB = {
+  exercises: [
+    { id: "e1", name: "Bench Press", muscleGroup: "Chest" }
+  ],
+  logs: []
+};
+
+// Must be set BEFORE requiring the server (so store.js picks it up)
+process.env.DB_PATH = TEST_DB_PATH;
+
+
+
 const request = require("supertest");
 const app = require("../server/server");
+
+beforeEach(() => {
+  fs.writeFileSync(TEST_DB_PATH, JSON.stringify(SEED_DB, null, 2), "utf-8");
+});
 
 
 describe("API health check", () => {
@@ -101,4 +124,8 @@ describe("Logs API", () => {
     expect(updated.body.reps).toBe(6);
     expect(updated.body.date).toBe("2026-01-21");
   });
+});
+
+afterAll(() => {
+  if (fs.existsSync(TEST_DB_PATH)) fs.unlinkSync(TEST_DB_PATH);
 });

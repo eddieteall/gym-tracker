@@ -204,15 +204,9 @@ app.post("/api/logs/:id/delete", (req, res) => {
 
 
 if (require.main === module) {
-  if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
   });
 }
 
 module.exports = app;
-
-}
-
-module.exports = app;
-
