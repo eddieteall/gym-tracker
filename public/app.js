@@ -1,10 +1,22 @@
 let selectedExerciseId = null;
 let editModal = null;
-
+let allExercises = [];
 
 function showServerError(show) {
   const el = document.getElementById("serverError");
   el.classList.toggle("d-none", !show);
+}
+
+function showMessage(type, text) {
+  const el = document.getElementById("uiMessage");
+  el.className = `alert alert-${type} m-3`;
+  el.textContent = text;
+  el.classList.remove("d-none");
+
+  // auto-hide after 3 seconds
+  setTimeout(() => {
+    el.classList.add("d-none");
+  }, 3000);
 }
 
 async function apiGet(url) {
@@ -65,12 +77,48 @@ function renderExerciseList(exercises) {
   }
 }
 
+function getSortedLogs(logs) {
+  const sortMode = document.getElementById("logSort").value;
+
+  const copy = [...logs];
+  copy.sort((a, b) => {
+    if (sortMode === "oldest") return a.date.localeCompare(b.date);
+    return b.date.localeCompare(a.date); // newest first
+  });
+
+  return copy;
+}function getSortedLogs(logs) {
+  const sortMode = document.getElementById("logSort").value;
+
+  const copy = [...logs];
+  copy.sort((a, b) => {
+    if (sortMode === "oldest") return a.date.localeCompare(b.date);
+    return b.date.localeCompare(a.date); // newest first
+  });
+
+  return copy;
+}
 function renderSelectedExercise(exercise) {
   document.getElementById("selectedTitle").textContent = `${exercise.name} (${exercise.id})`;
   document.getElementById("selectedMuscle").textContent = exercise.muscleGroup;
 
   const tbody = document.getElementById("logsTableBody");
   tbody.innerHTML = "";
+
+
+    const statsEl = document.getElementById("statsPanel");
+
+  if (exercise.logs.length === 0) {
+    statsEl.textContent = "No stats yet — add your first log.";
+  } else {
+    const heaviest = Math.max(...exercise.logs.map(l => l.weightKg));
+    const bestReps = Math.max(...exercise.logs.map(l => l.reps));
+
+    // most recent by date
+    const mostRecent = [...exercise.logs].sort((a, b) => b.date.localeCompare(a.date))[0];
+
+    statsEl.textContent = `PB: ${heaviest} kg • Best reps: ${bestReps} • Last: ${mostRecent.date}`;
+  }
 
     // If no logs yet then add a message displaying this
   if (exercise.logs.length === 0) {
@@ -88,7 +136,10 @@ function renderSelectedExercise(exercise) {
   }
 
 
-    for (const log of exercise.logs) {
+    const sortedLogs = getSortedLogs(exercise.logs);
+
+    for (const log of sortedLogs) {
+
     const tr = document.createElement("tr");
 
     //create edit button for each log entry
@@ -139,7 +190,17 @@ async function loadExercises() {
   const result = await apiGet("/api/exercises");
   if (!result.ok) return;
 
-  renderExerciseList(result.data);
+  allExercises = result.data;
+  applyExerciseFilter();
+}
+function applyExerciseFilter() {
+  const query = document.getElementById("exerciseSearch").value.toLowerCase().trim();
+
+  const filtered = allExercises.filter(ex =>
+    ex.name.toLowerCase().includes(query)
+  );
+
+  renderExerciseList(filtered);
 }
 
 async function selectExercise(id) {
@@ -163,8 +224,15 @@ function openEditLogModal(log) {
 
 document.addEventListener("DOMContentLoaded", () => {
   loadExercises();
-
+  document.getElementById("exerciseSearch").addEventListener("input", applyExerciseFilter);
     const addExerciseForm = document.getElementById("addExerciseForm");
+
+    document.getElementById("logSort").addEventListener("change", async () => {
+    if (selectedExerciseId) {
+      await selectExercise(selectedExerciseId);
+    }
+  });
+
 
   addExerciseForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -178,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (!result.ok) {
-      alert(result.data?.error || "Failed to add exercise");
+      showMessage("danger", result.data?.error || "Failed to add exercise");
       return;
     }
 
@@ -187,6 +255,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Refresh list
     await loadExercises();
+    showMessage("success", "Exercise added.");
+
   });
 
       editModal = new bootstrap.Modal(document.getElementById("editLogModal"));
@@ -207,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const result = await apiPost(`/api/logs/${logId}`, { date, weightKg, reps });
 
     if (!result.ok) {
-      alert(result.data?.error || "Failed to update log");
+      showMessage("danger", result.data?.error || "Failed to update log");
       return;
     }
 
@@ -249,6 +319,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Refresh the selected exercise details so the new log appears in the table
     await selectExercise(selectedExerciseId);
+    showMessage("success", "Log added.");
+
   });
 
 });
