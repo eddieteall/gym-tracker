@@ -87,16 +87,6 @@ function getSortedLogs(logs) {
   });
 
   return copy;
-}function getSortedLogs(logs) {
-  const sortMode = document.getElementById("logSort").value;
-
-  const copy = [...logs];
-  copy.sort((a, b) => {
-    if (sortMode === "oldest") return a.date.localeCompare(b.date);
-    return b.date.localeCompare(a.date); // newest first
-  });
-
-  return copy;
 }
 function renderSelectedExercise(exercise) {
   document.getElementById("selectedTitle").textContent = `${exercise.name} (${exercise.id})`;
