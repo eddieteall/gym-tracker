@@ -23,7 +23,19 @@ async function apiGet(url) {
   try {
     showServerError(false);
     const res = await fetch(url);
-    const data = await res.json();
+    const text = await res.text();
+
+    let data = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      data = { error: text };
+    }
+
+    if (!res.ok) {
+      showMessage("danger", data?.error || `Request failed (${res.status})`);
+    }
+
     return { ok: res.ok, status: res.status, data };
   } catch (err) {
     showServerError(true);
@@ -147,7 +159,7 @@ function renderSelectedExercise(exercise) {
 
     const result = await apiPost(`/api/logs/${log.id}/delete`, {});
     if (!result.ok) {
-      alert(result.data?.error || "Failed to delete log");
+      showMessage("danger", result.data?.error || "Failed to delete log");
       return;
     }
 
@@ -301,7 +313,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (!result.ok) {
-      alert(result.data?.error || "Failed to add log");
+      showMessage("danger", result.data?.error || "Failed to add log");
       return;
     }
 
