@@ -1,3 +1,12 @@
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: overall client-side structure (API helpers with fetch, rendering exercises/logs, Bootstrap modals, and form handlers).
+
+Prompt used:
+"Help me structure a vanilla JS + Bootstrap frontend for a gym tracker.
+Include fetch helpers, render exercise list + selected exercise logs, add/edit/delete logs, add/edit exercises, and show UI messages."
+*/
+
 // Global state
 let selectedExerciseId = null;
 let editModal = null;
@@ -24,6 +33,14 @@ function showMessage(type, text) {
   }, 3000);
 }
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: fetch wrapper helpers (GET/POST) with JSON parsing + basic error handling.
+
+Prompt used:
+"Write apiGet(url) and apiPost(url, body) helpers using fetch that return {ok,status,data},
+parse JSON safely, and show a server error banner on network failure."
+*/
 // API helper functions
 async function apiGet(url) {
   try {
@@ -130,6 +147,16 @@ function getSortedLogs(logs) {
 
   return copy;
 }
+
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: rendering selected exercise panel, logs table with edit/delete actions, and stats summary.
+
+Prompt used:
+"Render selected exercise details and a logs table in vanilla JS.
+Include Edit/Delete buttons per log (Bootstrap modal for edit), confirm before delete,
+and show simple stats like heaviest weight, best reps, and most recent date."
+*/
 function renderSelectedExercise(exercise) {
   document.getElementById("selectedTitle").textContent = `${exercise.name} (${exercise.id})`;
   document.getElementById("selectedMuscle").textContent = exercise.muscleGroup;
@@ -254,6 +281,14 @@ function openEditLogModal(log) {
 }
 
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: wiring DOMContentLoaded handlers (forms, modals, sorting, add/edit flows).
+
+Prompt used:
+"On DOMContentLoaded, wire up Bootstrap modals and form submit handlers:
+add exercise, edit exercise, add log, edit log, and refresh UI after successful requests."
+*/
 document.addEventListener("DOMContentLoaded", () => {
   loadExercises();
   editExerciseModal = new bootstrap.Modal(document.getElementById("editExerciseModal"));
