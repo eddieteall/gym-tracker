@@ -1,6 +1,16 @@
 # Gym Tracker API Documentation
 
 > **Documentation approach**
+<!--
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: structuring API documentation in a clear, ChatGPT-style format
+(endpoint sections, validation rules, example requests/responses).
+
+Prompt used:
+"Help structure REST API documentation in markdown similar to the ChatGPT API docs,
+listing endpoints, parameters, validation rules, responses, and error cases."
+-->
+
 > This API documentation was created using Postman to design, test, and validate all endpoints, ensuring that request and response examples accurately reflect the implemented API.
 
 ---

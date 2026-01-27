@@ -6,6 +6,8 @@ Prompt used:
 "Help me structure a vanilla JS + Bootstrap frontend for a gym tracker.
 Include fetch helpers, render exercise list + selected exercise logs, add/edit/delete logs, add/edit/delete exercises, and show UI messages."
 */
+// Note: VS Code AI auto-completion was used to suggest some inline comments and wording.
+// No functional logic was generated solely by auto-completion.
 
 // Global state
 let selectedExerciseId = null;

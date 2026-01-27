@@ -6,6 +6,8 @@ Prompt used:
 "Help me structure an Express server.js for a gym tracker API using readDB/writeDB.
 Include exercises + logs routes, validation, correct status codes, serve /public, and export app for Jest tests."
 */
+// Note: VS Code AI auto-completion was used to suggest some inline comments and wording.
+// No functional logic was generated solely by auto-completion.
 
 const express = require("express");
 const path = require("path");

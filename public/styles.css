@@ -1,3 +1,14 @@
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: general visual styling and layout ideas (spacing, colours, shadows, responsive tweaks)
+for a simple gym tracker web app.
+
+Prompt used:
+"Suggest clean, modern CSS styling for a small gym tracker app
+including cards, forms, buttons, lists, and basic mobile responsiveness."
+*/
+
+
 /* ---------- Global reset & base ---------- */
 * {
   box-sizing: border-box;
