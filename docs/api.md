@@ -1,25 +1,43 @@
 # Gym Tracker API Documentation
 
+> **Documentation approach**
+> This API documentation was created using Postman to design, test, and validate all endpoints, ensuring that request and response examples accurately reflect the implemented API.
+
+---
+
 ## Overview
 
-This API supports the Gym Tracker web application.
-It allows the client to create and retrieve exercises and workout logs using a REST-style interface.
+This API supports the **Gym Tracker** web application. It provides endpoints for managing exercises and workout logs, allowing users to record, view, update, and delete gym activity.
 
-The API is implemented using **Node.js and Express** and communicates using **JSON**.
+The API follows a REST‑style design using **HTTP methods**, **JSON request and response bodies**, and standard **HTTP status codes**.
 
-**Base URL:**
+The backend is implemented using **Node.js** and **Express**, with data stored in a local JSON file.
+
+---
+
+## Base URL
 
 ```
 http://localhost:3000
 ```
 
-All request and response bodies are JSON unless stated otherwise.
+All endpoints described below are relative to this base URL.
+
+---
+
+## Content Type
+
+All requests and responses use JSON unless stated otherwise.
+
+```
+Content-Type: application/json
+```
 
 ---
 
 ## HTTP Status Codes
 
-The API uses the following HTTP status codes:
+The API uses the following status codes:
 
 * **200 OK** – Request completed successfully
 * **201 Created** – A new resource was successfully created
@@ -28,20 +46,55 @@ The API uses the following HTTP status codes:
 
 ---
 
+## Endpoint Index
+
+### Health
+
+* `GET /api/health`
+
+### Exercises
+
+* `GET /api/exercises`
+* `GET /api/exercises/:id`
+* `POST /api/exercises`
+* `POST /api/exercises/:id`
+
+### Logs
+
+* `GET /api/logs`
+* `GET /api/logs/:id`
+* `POST /api/logs`
+* `POST /api/logs/:id`
+* `POST /api/logs/:id/delete`
+
+---
+
+## Health
+
+### GET `/api/health`
+
+Checks whether the API server is running.
+
+**Response – 200 OK**
+
+```json
+{ "status": "ok" }
+```
+
+---
+
 ## Exercises
 
 ### GET `/api/exercises`
 
-Returns a list of all exercises.
-This endpoint is used to populate the exercise list in the user interface.
-Only summary information is returned.
+Returns a list of all exercises. This endpoint is used to populate the exercise list in the client interface.
 
 **Response – 200 OK**
 
 ```json
 [
-  { "id": "e1", "name": "Bench Press" },
-  { "id": "e2", "name": "Squat" }
+  { "id": "e1", "name": "Bench Press", "muscleGroup": "Chest" },
+  { "id": "e2", "name": "Squat", "muscleGroup": "Legs" }
 ]
 ```
 
@@ -49,11 +102,11 @@ Only summary information is returned.
 
 ### GET `/api/exercises/:id`
 
-Returns detailed information about a single exercise, including all workout logs associated with it.
+Returns details of a single exercise, including all associated workout logs.
 
-**Path Parameters**
+**URL Parameters**
 
-* `id` (string): The exercise ID
+* `id` (string) – Exercise identifier
 
 **Response – 200 OK**
 
@@ -67,18 +120,16 @@ Returns detailed information about a single exercise, including all workout logs
       "id": "l1",
       "exerciseId": "e1",
       "date": "2026-01-20",
-      "weightKg": 60,
-      "reps": 8
+      "weightKg": 80,
+      "reps": 6
     }
   ]
 }
 ```
 
-**Error Response – 404 Not Found**
+**Errors**
 
-```json
-{ "error": "Unknown exercise id" }
-```
+* `404 Not Found` – Unknown exercise id
 
 ---
 
@@ -95,6 +146,11 @@ Creates a new exercise.
 }
 ```
 
+**Validation Rules**
+
+* `name` must be a non‑empty string
+* `muscleGroup` must be a non‑empty string
+
 **Response – 201 Created**
 
 ```json
@@ -105,11 +161,45 @@ Creates a new exercise.
 }
 ```
 
-**Error Response – 400 Bad Request**
+**Errors**
+
+* `400 Bad Request` – Missing or invalid fields
+
+---
+
+### POST `/api/exercises/:id`
+
+Updates an existing exercise.
+
+**URL Parameters**
+
+* `id` (string) – Exercise identifier
+
+**Request Body**
 
 ```json
-{ "error": "name is required" }
+{
+  "name": "Incline Bench Press",
+  "muscleGroup": "Upper Chest"
+}
 ```
+
+At least one field must be provided.
+
+**Response – 200 OK**
+
+```json
+{
+  "id": "e1",
+  "name": "Incline Bench Press",
+  "muscleGroup": "Upper Chest"
+}
+```
+
+**Errors**
+
+* `400 Bad Request` – Invalid field values
+* `404 Not Found` – Unknown exercise id
 
 ---
 
@@ -117,7 +207,7 @@ Creates a new exercise.
 
 ### GET `/api/logs`
 
-Returns a list of all workout logs in summary form.
+Returns all workout logs across all exercises.
 
 **Response – 200 OK**
 
@@ -125,8 +215,10 @@ Returns a list of all workout logs in summary form.
 [
   {
     "id": "l1",
+    "exerciseId": "e1",
     "date": "2026-01-20",
-    "exerciseId": "e1"
+    "weightKg": 80,
+    "reps": 6
   }
 ]
 ```
@@ -135,11 +227,11 @@ Returns a list of all workout logs in summary form.
 
 ### GET `/api/logs/:id`
 
-Returns detailed information about a single workout log, including the related exercise.
+Returns a single workout log.
 
-**Path Parameters**
+**URL Parameters**
 
-* `id` (string): The log ID
+* `id` (string) – Log identifier
 
 **Response – 200 OK**
 
@@ -148,27 +240,20 @@ Returns detailed information about a single workout log, including the related e
   "id": "l1",
   "exerciseId": "e1",
   "date": "2026-01-20",
-  "weightKg": 60,
-  "reps": 8,
-  "exercise": {
-    "id": "e1",
-    "name": "Bench Press",
-    "muscleGroup": "Chest"
-  }
+  "weightKg": 80,
+  "reps": 6
 }
 ```
 
-**Error Response – 404 Not Found**
+**Errors**
 
-```json
-{ "error": "Unknown log id" }
-```
+* `404 Not Found` – Unknown log id
 
 ---
 
 ### POST `/api/logs`
 
-Creates a new workout log for an existing exercise.
+Creates a new workout log for an exercise.
 
 **Request Body**
 
@@ -176,10 +261,17 @@ Creates a new workout log for an existing exercise.
 {
   "exerciseId": "e1",
   "date": "2026-01-20",
-  "weightKg": 60,
-  "reps": 8
+  "weightKg": 80,
+  "reps": 6
 }
 ```
+
+**Validation Rules**
+
+* `exerciseId` must reference an existing exercise
+* `date` must be in `YYYY-MM-DD` format
+* `weightKg` must be a positive number
+* `reps` must be a positive number
 
 **Response – 201 Created**
 
@@ -188,75 +280,75 @@ Creates a new workout log for an existing exercise.
   "id": "l2",
   "exerciseId": "e1",
   "date": "2026-01-20",
-  "weightKg": 60,
-  "reps": 8
+  "weightKg": 80,
+  "reps": 6
 }
 ```
 
-**Error Response – 400 Bad Request**
+**Errors**
 
-```json
-{ "error": "exerciseId does not exist" }
-```
+* `400 Bad Request` – Invalid or missing fields
+* `404 Not Found` – Unknown exercise id
 
 ---
-
-## Additional Endpoints
 
 ### POST `/api/logs/:id`
 
 Updates an existing workout log.
-Any subset of fields may be provided.
 
-**Request Body Example**
+**Request Body**
 
 ```json
 {
   "date": "2026-01-21",
-  "weightKg": 62.5,
-  "reps": 6
+  "weightKg": 82.5,
+  "reps": 5
 }
 ```
+
+All fields are required.
 
 **Response – 200 OK**
 
 ```json
 {
-  "id": "l2",
+  "id": "l1",
   "exerciseId": "e1",
   "date": "2026-01-21",
-  "weightKg": 62.5,
-  "reps": 6
+  "weightKg": 82.5,
+  "reps": 5
 }
 ```
 
-**Error Response – 404 Not Found**
+**Errors**
 
-```json
-{ "error": "Unknown log id" }
-```
+* `400 Bad Request` – Invalid input values
+* `404 Not Found` – Unknown log id
 
 ---
 
 ### POST `/api/logs/:id/delete`
 
-Deletes an existing workout log.
+Deletes a workout log.
+
+**URL Parameters**
+
+* `id` (string) – Log identifier
 
 **Response – 200 OK**
 
 ```json
-{
-  "id": "l2",
-  "exerciseId": "e1",
-  "date": "2026-01-21",
-  "weightKg": 62.5,
-  "reps": 6
-}
+{ "id": "l1" }
 ```
 
-**Error Response – 404 Not Found**
+**Errors**
 
-```json
-{ "error": "Unknown log id" }
-```
+* `404 Not Found` – Unknown log id
 
+---
+
+## Notes
+
+* This documentation was generated and structured using **Postman**, ensuring clarity and consistency without requiring access to the source code.
+* All data is stored locally in a JSON file.
+* Authentication and authorisation are not implemented as this API is intended for educational use.
