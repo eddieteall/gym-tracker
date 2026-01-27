@@ -2,120 +2,21 @@
   "exercises": [
     {
       "id": "e1",
-      "name": "Bench Press",
-      "muscleGroup": "Chest"
-    },
-    {
-      "id": "e2",
       "name": "Squat",
       "muscleGroup": "Legs"
     },
     {
-      "id": "e3",
-      "name": "Test Exercise",
-      "muscleGroup": "Test Group"
-    },
-    {
-      "id": "e4",
-      "name": "Test Exercise",
-      "muscleGroup": "Test Group"
-    },
-    {
-      "id": "e5",
-      "name": "Log Test Exercise",
-      "muscleGroup": "Test"
-    },
-    {
-      "id": "e6",
-      "name": "Log Test Exercise",
-      "muscleGroup": "Test"
-    },
-    {
-      "id": "e7",
-      "name": "Test Exercise",
-      "muscleGroup": "Test Group"
-    },
-    {
-      "id": "e8",
-      "name": "Log Test Exercise",
-      "muscleGroup": "Test"
-    },
-    {
-      "id": "e9",
-      "name": "Log Test Exercise",
-      "muscleGroup": "Test"
-    },
-    {
-      "id": "e10",
-      "name": "Test Exercise",
-      "muscleGroup": "Test Group"
-    },
-    {
-      "id": "e11",
-      "name": "Log Test Exercise",
-      "muscleGroup": "Test"
-    },
-    {
-      "id": "e12",
-      "name": "Log Test Exercise",
-      "muscleGroup": "Test"
+      "id": "e2",
+      "name": "Bench Press",
+      "muscleGroup": "Chest"
     }
   ],
   "logs": [
     {
       "id": "l1",
-      "exerciseId": "e1",
+      "exerciseId": "e2",
       "date": "2026-01-26",
       "weightKg": 70,
-      "reps": 6
-    },
-    {
-      "id": "l2",
-      "exerciseId": "e1",
-      "date": "2026-01-14",
-      "weightKg": 70,
-      "reps": 3
-    },
-    {
-      "id": "l3",
-      "exerciseId": "e5",
-      "date": "2026-01-20",
-      "weightKg": 60,
-      "reps": 8
-    },
-    {
-      "id": "l4",
-      "exerciseId": "e6",
-      "date": "2026-01-21",
-      "weightKg": 62.5,
-      "reps": 6
-    },
-    {
-      "id": "l5",
-      "exerciseId": "e8",
-      "date": "2026-01-20",
-      "weightKg": 60,
-      "reps": 8
-    },
-    {
-      "id": "l6",
-      "exerciseId": "e9",
-      "date": "2026-01-21",
-      "weightKg": 62.5,
-      "reps": 6
-    },
-    {
-      "id": "l7",
-      "exerciseId": "e11",
-      "date": "2026-01-20",
-      "weightKg": 60,
-      "reps": 8
-    },
-    {
-      "id": "l8",
-      "exerciseId": "e12",
-      "date": "2026-01-21",
-      "weightKg": 62.5,
       "reps": 6
     }
   ]

@@ -6,6 +6,18 @@ const { readDB, writeDB } = require("./lib/store");
 const app = express();
 const PORT = 3000;
 
+function nextId(items, prefix) {
+  let max = 0;
+  for (const item of items) {
+    if (typeof item.id === "string" && item.id.startsWith(prefix)) {
+      const n = Number(item.id.slice(prefix.length));
+      if (!Number.isNaN(n) && n > max) max = n;
+    }
+  }
+  return `${prefix}${max + 1}`;
+}
+
+
 app.use(express.json());
 
 // Serve static files later 
@@ -37,7 +49,7 @@ app.get("/api/exercises/:id", (req, res) => {
   );
 
   if (!exercise) {
-    return res.status(400).json({ error: "Unknown exercise id" });
+    return res.status(404).json({ error: "Unknown exercise id" });
   }
 
   const logs = db.logs.filter(
@@ -63,17 +75,17 @@ app.post("/api/exercises", (req, res) => {
 
   const db = readDB();
 
-  const nextNumber = db.exercises.length + 1;
   const newExercise = {
-    id: `e${nextNumber}`,
+    id: nextId(db.exercises, "e"),
     name: name.trim(),
     muscleGroup: muscleGroup.trim()
   };
 
+
   db.exercises.push(newExercise);
   writeDB(db);
 
-  res.status(200).json(newExercise);
+  res.status(201).json(newExercise);
 });
 
 app.get("/api/logs", (req, res) => {
@@ -96,7 +108,7 @@ app.get("/api/logs/:id", (req, res) => {
   );
 
   if (!log) {
-    return res.status(400).json({ error: "Unknown log id" });
+    return res.status(404).json({ error: "Unknown log id" });
   }
 
   const exercise = db.exercises.find(
@@ -135,19 +147,19 @@ app.post("/api/logs", (req, res) => {
     return res.status(400).json({ error: "exerciseId does not exist" });
   }
 
-  const nextNumber = db.logs.length + 1;
   const newLog = {
-    id: `l${nextNumber}`,
+    id: nextId(db.logs, "l"),
     exerciseId,
     date,
     weightKg,
     reps
   };
 
+
   db.logs.push(newLog);
   writeDB(db);
 
-  res.status(200).json(newLog);
+  res.status(201).json(newLog);
 });
 
 app.post("/api/logs/:id", (req, res) => {
@@ -157,7 +169,7 @@ app.post("/api/logs/:id", (req, res) => {
   const log = db.logs.find(l => l.id === req.params.id);
 
   if (!log) {
-    return res.status(400).json({ error: "Unknown log id" });
+    return res.status(404).json({ error: "Unknown log id" });
   }
 
   if (date !== undefined) {
@@ -193,7 +205,7 @@ app.post("/api/logs/:id/delete", (req, res) => {
   );
 
   if (index === -1) {
-    return res.status(400).json({ error: "Unknown log id" });
+    return res.status(404).json({ error: "Unknown log id" });
   }
 
   const deleted = db.logs.splice(index, 1)[0];
