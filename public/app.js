@@ -1,12 +1,17 @@
+// Global state
 let selectedExerciseId = null;
 let editModal = null;
 let allExercises = [];
+let editExerciseModal = null;
 
+
+// UI helper functions
 function showServerError(show) {
   const el = document.getElementById("serverError");
   el.classList.toggle("d-none", !show);
 }
 
+// type is one of "success", "danger", "warning", "info"
 function showMessage(type, text) {
   const el = document.getElementById("uiMessage");
   el.className = `alert alert-${type} m-3`;
@@ -19,6 +24,7 @@ function showMessage(type, text) {
   }, 3000);
 }
 
+// API helper functions
 async function apiGet(url) {
   try {
     showServerError(false);
@@ -71,6 +77,21 @@ async function apiPost(url, bodyObj) {
 
 }
 
+// Exercise edit modal helper ---
+async function openEditExerciseModal(exerciseId) {
+  const result = await apiGet(`/api/exercises/${exerciseId}`);
+  if (!result.ok) return;
+
+  const ex = result.data;
+
+  document.getElementById("editExerciseId").value = ex.id;
+  document.getElementById("editExerciseName").value = ex.name;
+  document.getElementById("editExerciseMuscle").value = ex.muscleGroup;
+
+  editExerciseModal.show();
+}
+
+
 function renderExerciseList(exercises) {
   const listEl = document.getElementById("exerciseList");
   listEl.innerHTML = "";
@@ -84,7 +105,16 @@ function renderExerciseList(exercises) {
     btn.textContent = ex.name;
     btn.addEventListener("click", () => selectExercise(ex.id));
 
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn btn-sm btn-outline-secondary";
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      await openEditExerciseModal(ex.id);
+    });
+
     li.appendChild(btn);
+    li.appendChild(editBtn);
     listEl.appendChild(li);
   }
 }
@@ -226,6 +256,32 @@ function openEditLogModal(log) {
 
 document.addEventListener("DOMContentLoaded", () => {
   loadExercises();
+  editExerciseModal = new bootstrap.Modal(document.getElementById("editExerciseModal"));
+  // Handle "Edit Exercise" form submit
+document.getElementById("editExerciseForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const id = document.getElementById("editExerciseId").value;
+  const name = document.getElementById("editExerciseName").value;
+  const muscleGroup = document.getElementById("editExerciseMuscle").value;
+
+  const result = await apiPost(`/api/exercises/${id}`, { name, muscleGroup });
+
+  if (!result.ok) {
+    showMessage("danger", result.data?.error || "Failed to update exercise");
+    return;
+  }
+
+  editExerciseModal.hide();
+
+  await loadExercises();
+  if (selectedExerciseId === id) {
+    await selectExercise(id);
+  }
+
+  showMessage("success", "Exercise updated.");
+});
+
   document.getElementById("exerciseSearch").addEventListener("input", applyExerciseFilter);
     const addExerciseForm = document.getElementById("addExerciseForm");
 

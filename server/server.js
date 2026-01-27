@@ -2,10 +2,11 @@ const express = require("express");
 const path = require("path");
 const { readDB, writeDB } = require("./lib/store");
 
-
+// Create Express app
 const app = express();
 const PORT = 3000;
 
+// Generate next ID with given prefix
 function nextId(items, prefix) {
   let max = 0;
   for (const item of items) {
@@ -17,7 +18,12 @@ function nextId(items, prefix) {
   return `${prefix}${max + 1}`;
 }
 
+// simple YYYY-MM-DD check
+function isValidISODate(dateStr) {  
+  return typeof dateStr === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateStr);
+}
 
+// Middleware to parse JSON bodies
 app.use(express.json());
 
 // Serve static files later 
@@ -28,7 +34,7 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-
+// Exercises routes
 app.get("/api/exercises", (req, res) => {
   const db = readDB();
 
@@ -40,7 +46,7 @@ app.get("/api/exercises", (req, res) => {
 
   res.status(200).json(list);
 });
-
+// Get exercise detail with logs
 app.get("/api/exercises/:id", (req, res) => {
   const db = readDB();
 
@@ -62,7 +68,7 @@ app.get("/api/exercises/:id", (req, res) => {
   });
 });
 
-
+// Create new exercise
 app.post("/api/exercises", (req, res) => {
   const { name, muscleGroup } = req.body;
 
@@ -88,6 +94,7 @@ app.post("/api/exercises", (req, res) => {
   res.status(201).json(newExercise);
 });
 
+// Logs routes
 app.get("/api/logs", (req, res) => {
   const db = readDB();
 
@@ -100,6 +107,7 @@ app.get("/api/logs", (req, res) => {
   res.status(200).json(list);
 });
 
+// Get log detail with exercise info
 app.get("/api/logs/:id", (req, res) => {
   const db = readDB();
 
@@ -121,14 +129,15 @@ app.get("/api/logs/:id", (req, res) => {
   });
 });
 
+// Create new log
 app.post("/api/logs", (req, res) => {
   const { exerciseId, date, weightKg, reps } = req.body;
 
   if (!exerciseId || typeof exerciseId !== "string") {
     return res.status(400).json({ error: "exerciseId is required" });
   }
-  if (!date || typeof date !== "string") {
-    return res.status(400).json({ error: "date is required" });
+  if  (!isValidISODate(date)) {
+    return res.status(400).json({ error: "date must be YYYY-MM-DD" });
   }
   if (typeof weightKg !== "number" || weightKg <= 0) {
     return res.status(400).json({ error: "weightKg must be a positive number" });
@@ -162,6 +171,7 @@ app.post("/api/logs", (req, res) => {
   res.status(201).json(newLog);
 });
 
+// Update existing log
 app.post("/api/logs/:id", (req, res) => {
   const { date, weightKg, reps } = req.body;
 
@@ -197,6 +207,7 @@ app.post("/api/logs/:id", (req, res) => {
   res.status(200).json(log);
 });
 
+// Delete existing log
 app.post("/api/logs/:id/delete", (req, res) => {
   const db = readDB();
 
@@ -214,7 +225,56 @@ app.post("/api/logs/:id/delete", (req, res) => {
   res.status(200).json(deleted);
 });
 
+app.post("/api/exercises/:id", (req, res) => {
+  const { name, muscleGroup } = req.body;
 
+  const db = readDB();
+  const exercise = db.exercises.find(e => e.id === req.params.id);
+
+  if (!exercise) {
+    return res.status(404).json({ error: "Unknown exercise id" });
+  }
+
+  if (name !== undefined) {
+    if (typeof name !== "string" || name.trim() === "") {
+      return res.status(400).json({ error: "Invalid name" });
+    }
+    exercise.name = name.trim();
+  }
+
+  if (muscleGroup !== undefined) {
+    if (typeof muscleGroup !== "string" || muscleGroup.trim() === "") {
+      return res.status(400).json({ error: "Invalid muscleGroup" });
+    }
+    exercise.muscleGroup = muscleGroup.trim();
+  }
+
+  writeDB(db);
+  res.status(200).json(exercise);
+});
+
+app.post("/api/exercises/:id/delete", (req, res) => {
+  const db = readDB();
+
+  const exId = req.params.id;
+  const exerciseIndex = db.exercises.findIndex(e => e.id === exId);
+
+  if (exerciseIndex === -1) {
+    return res.status(404).json({ error: "Unknown exercise id" });
+  }
+
+  const hasLogs = db.logs.some(l => l.exerciseId === exId);
+  if (hasLogs) {
+    return res.status(400).json({ error: "Cannot delete exercise with logs" });
+  }
+
+  const deleted = db.exercises.splice(exerciseIndex, 1)[0];
+  writeDB(db);
+  res.status(200).json(deleted);
+});
+
+
+// Start server
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
