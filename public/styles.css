@@ -1,10 +1,148 @@
-/* Small custom tweaks on top of Bootstrap */
-body { padding-bottom: 2rem; }
-
-#exerciseList button.btn-link {
-  text-decoration: none;
+/* ---------- Global reset & base ---------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-#exerciseList button.btn-link:hover {
-  text-decoration: underline;
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: #f4f6f8;
+  color: #1f2933;
+  line-height: 1.6;
+}
+
+/* ---------- Layout ---------- */
+header {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: white;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+/* ---------- Cards / sections ---------- */
+section,
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- Headings ---------- */
+h1,
+h2,
+h3 {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+h2 {
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.4rem;
+}
+
+/* ---------- Forms ---------- */
+form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+label {
+  font-weight: 500;
+}
+
+input,
+select {
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* ---------- Buttons ---------- */
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s ease;
+}
+
+button:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* ---------- Lists / logs ---------- */
+ul {
+  list-style: none;
+  margin-top: 0.5rem;
+}
+
+li {
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: #f9fafb;
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ---------- Utility ---------- */
+.muted {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.error {
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 0.6rem;
+  border-radius: 8px;
+}
+
+.success {
+  color: #065f46;
+  background: #d1fae5;
+  padding: 0.6rem;
+  border-radius: 8px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  main {
+    padding: 0.75rem;
+  }
+
+  li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
 }
