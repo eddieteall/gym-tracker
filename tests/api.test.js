@@ -81,7 +81,7 @@ describe("Exercises API", () => {
       .post("/api/exercises")
       .send({ name: "Test Exercise", muscleGroup: "Test Group" });
 
-    // If you haven't changed the server yet, you'll get 200; after you switch to 201, update this.
+    
     expect([200, 201]).toContain(res.statusCode);
     expect(res.headers["content-type"]).toMatch(/json/);
     expect(res.body).toHaveProperty("id");
@@ -99,6 +99,57 @@ describe("Exercises API", () => {
     expect(res.body).toHaveProperty("error");
   });
 });
+
+test("POST /api/exercises/:id updates an exercise", async () => {
+  // create
+  const created = await request(app)
+    .post("/api/exercises")
+    .send({ name: "Old Name", muscleGroup: "Old Group" });
+
+  expect(created.statusCode).toBe(201);
+  const exId = created.body.id;
+
+  // update
+  const updated = await request(app)
+    .post(`/api/exercises/${exId}`)
+    .send({ name: "New Name", muscleGroup: "New Group" });
+
+  expect(updated.statusCode).toBe(200);
+  expect(updated.body.id).toBe(exId);
+  expect(updated.body.name).toBe("New Name");
+  expect(updated.body.muscleGroup).toBe("New Group");
+
+  // fetch to confirm persistence
+  const fetched = await request(app).get(`/api/exercises/${exId}`);
+  expect(fetched.statusCode).toBe(200);
+  expect(fetched.body.name).toBe("New Name");
+  expect(fetched.body.muscleGroup).toBe("New Group");
+});
+
+test("POST /api/exercises/:id returns 400 for invalid update", async () => {
+  const created = await request(app)
+    .post("/api/exercises")
+    .send({ name: "Valid", muscleGroup: "Valid" });
+
+  const exId = created.body.id;
+
+  const bad = await request(app)
+    .post(`/api/exercises/${exId}`)
+    .send({ name: "" }); // invalid
+
+  expect(bad.statusCode).toBe(400);
+  expect(bad.body).toHaveProperty("error");
+});
+
+test("POST /api/exercises/:id returns 404 for unknown id", async () => {
+  const res = await request(app)
+    .post("/api/exercises/does-not-exist")
+    .send({ name: "X", muscleGroup: "Y" });
+
+  expect(res.statusCode).toBe(404);
+  expect(res.body).toHaveProperty("error");
+});
+
 
 describe("Logs API", () => {
   async function createExerciseForLogs() {
@@ -211,3 +262,5 @@ describe("Logs API", () => {
     expect(updated.body.date).toBe("2026-01-21");
   });
 });
+
+  
