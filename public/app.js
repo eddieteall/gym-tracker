@@ -360,7 +360,7 @@ document.getElementById("editExerciseForm").addEventListener("submit", async (ev
     }
   });
 
-
+  // Handle "Add Exercise" form submit
   addExerciseForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
