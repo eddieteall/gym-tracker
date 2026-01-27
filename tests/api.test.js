@@ -6,16 +6,12 @@ const TEST_DB_PATH = path.join(__dirname, "test-db.json");
 
 // Seed data for each test
 const SEED_DB = {
-  exercises: [
-    { id: "e1", name: "Bench Press", muscleGroup: "Chest" }
-  ],
+  exercises: [{ id: "e1", name: "Bench Press", muscleGroup: "Chest" }],
   logs: []
 };
 
 // Must be set BEFORE requiring the server (so store.js picks it up)
 process.env.DB_PATH = TEST_DB_PATH;
-
-
 
 const request = require("supertest");
 const app = require("../server/server");
@@ -24,6 +20,9 @@ beforeEach(() => {
   fs.writeFileSync(TEST_DB_PATH, JSON.stringify(SEED_DB, null, 2), "utf-8");
 });
 
+afterAll(() => {
+  if (fs.existsSync(TEST_DB_PATH)) fs.unlinkSync(TEST_DB_PATH);
+});
 
 describe("API health check", () => {
   test("GET /api/health returns status ok", async () => {
@@ -44,12 +43,46 @@ describe("Exercises API", () => {
     expect(Array.isArray(res.body)).toBe(true);
   });
 
+  test("GET /api/exercises/:id returns one exercise with logs array", async () => {
+    const created = await request(app)
+      .post("/api/exercises")
+      .send({ name: "Detail Exercise", muscleGroup: "Back" });
+
+    expect([200, 201]).toContain(created.statusCode);
+    const exId = created.body.id;
+
+    await request(app)
+      .post("/api/logs")
+      .send({ exerciseId: exId, date: "2026-01-20", weightKg: 50, reps: 10 });
+
+    const res = await request(app).get(`/api/exercises/${exId}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("id", exId);
+    expect(res.body).toHaveProperty("name", "Detail Exercise");
+    expect(res.body).toHaveProperty("muscleGroup", "Back");
+    expect(Array.isArray(res.body.logs)).toBe(true);
+    expect(res.body.logs.length).toBe(1);
+    expect(res.body.logs[0]).toHaveProperty("exerciseId", exId);
+  });
+
+  test("GET /api/exercises/:id returns 404 for unknown id", async () => {
+    const res = await request(app).get("/api/exercises/nope");
+
+    // If your server still returns 400, this will fail; then we change the server to 404.
+    expect(res.statusCode).toBe(404);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("error");
+  });
+
   test("POST /api/exercises creates a new exercise", async () => {
     const res = await request(app)
       .post("/api/exercises")
       .send({ name: "Test Exercise", muscleGroup: "Test Group" });
 
-    expect(res.statusCode).toBe(200);
+    // If you haven't changed the server yet, you'll get 200; after you switch to 201, update this.
+    expect([200, 201]).toContain(res.statusCode);
     expect(res.headers["content-type"]).toMatch(/json/);
     expect(res.body).toHaveProperty("id");
     expect(res.body.name).toBe("Test Exercise");
@@ -83,13 +116,56 @@ describe("Logs API", () => {
       .post("/api/logs")
       .send({ exerciseId, date: "2026-01-20", weightKg: 60, reps: 8 });
 
-    expect(res.statusCode).toBe(200);
+    expect([200, 201]).toContain(res.statusCode);
     expect(res.headers["content-type"]).toMatch(/json/);
     expect(res.body).toHaveProperty("id");
     expect(res.body.exerciseId).toBe(exerciseId);
     expect(res.body.date).toBe("2026-01-20");
     expect(res.body.weightKg).toBe(60);
     expect(res.body.reps).toBe(8);
+  });
+
+  test("GET /api/logs returns an array of logs", async () => {
+    const exerciseId = await createExerciseForLogs();
+
+    await request(app)
+      .post("/api/logs")
+      .send({ exerciseId, date: "2026-01-20", weightKg: 60, reps: 8 });
+
+    const res = await request(app).get("/api/logs");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBe(1);
+    expect(res.body[0]).toHaveProperty("exerciseId", exerciseId);
+  });
+
+  test("GET /api/logs/:id returns one log with exercise object", async () => {
+    const exerciseId = await createExerciseForLogs();
+
+    const created = await request(app)
+      .post("/api/logs")
+      .send({ exerciseId, date: "2026-01-20", weightKg: 60, reps: 8 });
+
+    const logId = created.body.id;
+
+    const res = await request(app).get(`/api/logs/${logId}`);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("id", logId);
+    expect(res.body).toHaveProperty("exerciseId", exerciseId);
+    expect(res.body).toHaveProperty("exercise");
+    expect(res.body.exercise).toHaveProperty("id", exerciseId);
+  });
+
+  test("GET /api/logs/:id returns 404 for unknown id", async () => {
+    const res = await request(app).get("/api/logs/nope");
+
+    expect(res.statusCode).toBe(404);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("error");
   });
 
   test("POST /api/logs returns 400 for non-existent exerciseId", async () => {
@@ -102,17 +178,27 @@ describe("Logs API", () => {
     expect(res.body).toHaveProperty("error");
   });
 
+  test("POST /api/logs returns 400 for missing date", async () => {
+    const exerciseId = await createExerciseForLogs();
+
+    const res = await request(app)
+      .post("/api/logs")
+      .send({ exerciseId, weightKg: 60, reps: 8 });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.headers["content-type"]).toMatch(/json/);
+    expect(res.body).toHaveProperty("error");
+  });
+
   test("POST /api/logs/:id updates an existing log", async () => {
     const exerciseId = await createExerciseForLogs();
 
-    // create log first
     const created = await request(app)
       .post("/api/logs")
       .send({ exerciseId, date: "2026-01-20", weightKg: 60, reps: 8 });
 
     const logId = created.body.id;
 
-    // update it
     const updated = await request(app)
       .post(`/api/logs/${logId}`)
       .send({ weightKg: 62.5, reps: 6, date: "2026-01-21" });
@@ -124,8 +210,4 @@ describe("Logs API", () => {
     expect(updated.body.reps).toBe(6);
     expect(updated.body.date).toBe("2026-01-21");
   });
-});
-
-afterAll(() => {
-  if (fs.existsSync(TEST_DB_PATH)) fs.unlinkSync(TEST_DB_PATH);
 });
