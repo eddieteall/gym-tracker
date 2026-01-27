@@ -4,7 +4,7 @@ Used for: overall client-side structure (API helpers with fetch, rendering exerc
 
 Prompt used:
 "Help me structure a vanilla JS + Bootstrap frontend for a gym tracker.
-Include fetch helpers, render exercise list + selected exercise logs, add/edit/delete logs, add/edit exercises, and show UI messages."
+Include fetch helpers, render exercise list + selected exercise logs, add/edit/delete logs, add/edit/delete exercises, and show UI messages."
 */
 
 // Global state
@@ -129,9 +129,41 @@ function renderExerciseList(exercises) {
       e.stopPropagation();
       await openEditExerciseModal(ex.id);
     });
+    /*
+    LLM ASSISTANCE (ChatGPT 5.2):
+    Used for: adding "Delete exercise" button in list and calling POST /api/exercises/:id/delete with confirm + UI refresh.
+
+    Prompt used:
+    "Add a Delete button next to each exercise that confirms, calls /api/exercises/:id/delete,
+    handles 400 errors (e.g., has logs), refreshes the list, and shows a message."
+    */
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn btn-sm btn-outline-danger ms-2";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+
+      if (!confirm("Delete this exercise?")) return;
+
+      const result = await apiPost(`/api/exercises/${ex.id}/delete`, {});
+      if (!result.ok) {
+      showMessage("danger", result.data?.error || "Failed to delete exercise");
+      return;
+      }
+
+      if (selectedExerciseId === ex.id) {
+      selectedExerciseId = null;
+      }
+
+      await loadExercises();
+      showMessage("success", "Exercise deleted.");
+    });
+
 
     li.appendChild(btn);
     li.appendChild(editBtn);
+    li.appendChild(deleteBtn);
     listEl.appendChild(li);
   }
 }
