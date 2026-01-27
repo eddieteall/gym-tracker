@@ -1,3 +1,12 @@
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: overall Express server structure (file layout, middleware, routes, JSON DB pattern, and exporting app for tests).
+
+Prompt used:
+"Help me structure an Express server.js for a gym tracker API using readDB/writeDB.
+Include exercises + logs routes, validation, correct status codes, serve /public, and export app for Jest tests."
+*/
+
 const express = require("express");
 const path = require("path");
 const { readDB, writeDB } = require("./lib/store");
@@ -6,6 +15,13 @@ const { readDB, writeDB } = require("./lib/store");
 const app = express();
 const PORT = 3000;
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: helper to generate next available id with a prefix.
+
+Prompt used:
+"Write nextId(items, prefix) that scans existing ids like e1/l12 and returns the next id safely."
+*/
 // Generate next ID with given prefix
 function nextId(items, prefix) {
   let max = 0;
@@ -17,6 +33,14 @@ function nextId(items, prefix) {
   }
   return `${prefix}${max + 1}`;
 }
+
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: simple YYYY-MM-DD validation helper.
+
+Prompt used:
+"Add isValidISODate(dateStr) that checks YYYY-MM-DD format (regex is fine)."
+*/
 
 // simple YYYY-MM-DD check
 function isValidISODate(dateStr) {  
@@ -46,6 +70,7 @@ app.get("/api/exercises", (req, res) => {
 
   res.status(200).json(list);
 });
+
 // Get exercise detail with logs
 app.get("/api/exercises/:id", (req, res) => {
   const db = readDB();
@@ -68,6 +93,13 @@ app.get("/api/exercises/:id", (req, res) => {
   });
 });
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: create exercise endpoint (validation + 201 response).
+
+Prompt used:
+"Implement POST /api/exercises with validation, nextId('e'), writeDB, and return 201 JSON."
+*/
 // Create new exercise
 app.post("/api/exercises", (req, res) => {
   const { name, muscleGroup } = req.body;
@@ -107,6 +139,14 @@ app.get("/api/logs", (req, res) => {
   res.status(200).json(list);
 });
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: log detail endpoint including related exercise (or null).
+
+Prompt used:
+"Implement GET /api/logs/:id returning the log plus its exercise object (or null), with 404 handling."
+*/
+
 // Get log detail with exercise info
 app.get("/api/logs/:id", (req, res) => {
   const db = readDB();
@@ -128,6 +168,14 @@ app.get("/api/logs/:id", (req, res) => {
     exercise
   });
 });
+
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: create log endpoint (validation incl. exercise exists) and 201 response.
+
+Prompt used:
+"Implement POST /api/logs with validation (exerciseId exists, YYYY-MM-DD date, positive weightKg/reps), nextId('l'), writeDB, return 201."
+*/
 
 // Create new log
 app.post("/api/logs", (req, res) => {
@@ -171,6 +219,13 @@ app.post("/api/logs", (req, res) => {
   res.status(201).json(newLog);
 });
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: update log endpoint with partial fields + validation.
+
+Prompt used:
+"Implement POST /api/logs/:id for partial updates (date/weightKg/reps), validate inputs, 404 if not found, writeDB, return 200."
+*/
 // Update existing log
 app.post("/api/logs/:id", (req, res) => {
   const { date, weightKg, reps } = req.body;
@@ -207,6 +262,13 @@ app.post("/api/logs/:id", (req, res) => {
   res.status(200).json(log);
 });
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: delete log endpoint (findIndex + splice) with 404 handling.
+
+Prompt used:
+"Implement POST /api/logs/:id/delete that deletes a log by id, returns 404 if missing, writes DB, and returns deleted log."
+*/
 // Delete existing log
 app.post("/api/logs/:id/delete", (req, res) => {
   const db = readDB();
@@ -225,6 +287,13 @@ app.post("/api/logs/:id/delete", (req, res) => {
   res.status(200).json(deleted);
 });
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: update exercise endpoint with partial fields + validation.
+
+Prompt used:
+"Implement POST /api/exercises/:id for partial updates (name/muscleGroup), validate + trim, 404 if missing, writeDB, return 200."
+*/
 app.post("/api/exercises/:id", (req, res) => {
   const { name, muscleGroup } = req.body;
 
@@ -253,6 +322,13 @@ app.post("/api/exercises/:id", (req, res) => {
   res.status(200).json(exercise);
 });
 
+/*
+LLM ASSISTANCE (ChatGPT 5.2):
+Used for: delete exercise endpoint with constraint (cannot delete if logs reference it).
+
+Prompt used:
+"Implement POST /api/exercises/:id/delete that blocks deletion when logs exist for the exercise, else deletes and returns it."
+*/
 app.post("/api/exercises/:id/delete", (req, res) => {
   const db = readDB();
 
