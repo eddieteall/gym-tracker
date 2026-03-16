@@ -11,14 +11,14 @@
       "muscleGroup": "Chest"
     },
     {
-      "id": "e3",
+      "id": "e4",
       "name": "Shoulder Press",
       "muscleGroup": "Shoulders"
     },
     {
-      "id": "e4",
-      "name": "Pull Up",
-      "muscleGroup": "Back and Biceps"
+      "id": "e5",
+      "name": "Bicep Curls",
+      "muscleGroup": "Biceps"
     }
   ],
   "logs": [
@@ -31,10 +31,73 @@
     },
     {
       "id": "l2",
+      "exerciseId": "e2",
+      "date": "2025-04-07",
+      "weightKg": 60,
+      "reps": 5
+    },
+    {
+      "id": "l3",
+      "exerciseId": "e2",
+      "date": "2025-02-19",
+      "weightKg": 75,
+      "reps": 5
+    },
+    {
+      "id": "l4",
+      "exerciseId": "e2",
+      "date": "2025-03-15",
+      "weightKg": 75,
+      "reps": 3
+    },
+    {
+      "id": "l5",
+      "exerciseId": "e2",
+      "date": "2023-09-25",
+      "weightKg": 87.5,
+      "reps": 1
+    },
+    {
+      "id": "l6",
       "exerciseId": "e1",
-      "date": "2026-01-27",
+      "date": "2026-01-28",
       "weightKg": 100,
       "reps": 6
+    },
+    {
+      "id": "l7",
+      "exerciseId": "e1",
+      "date": "2026-01-17",
+      "weightKg": 105,
+      "reps": 6
+    },
+    {
+      "id": "l8",
+      "exerciseId": "e1",
+      "date": "2026-01-09",
+      "weightKg": 120,
+      "reps": 6
+    },
+    {
+      "id": "l9",
+      "exerciseId": "e4",
+      "date": "2026-01-28",
+      "weightKg": 20,
+      "reps": 5
+    },
+    {
+      "id": "l10",
+      "exerciseId": "e4",
+      "date": "2026-01-28",
+      "weightKg": 10,
+      "reps": 12
+    },
+    {
+      "id": "l11",
+      "exerciseId": "e5",
+      "date": "2026-01-28",
+      "weightKg": 20,
+      "reps": 10
     }
   ]
 }
